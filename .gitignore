@@ -1,0 +1,10 @@
+# ignore folders
+venv/
+
+# ignore file
+**/.DS_Store
+**/*.log
+**/*.txt
+keys/*.crt
+keys/*.pem
+keys/*.key

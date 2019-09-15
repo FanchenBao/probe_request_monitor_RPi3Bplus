@@ -1,0 +1,1 @@
+This is where the credentials for connecting this device to a shadow client on aws iot should reside. For more details, follow this tutorial https://docs.aws.amazon.com/iot/latest/developerguide/iot-plant-step2.html
