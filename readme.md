@@ -19,9 +19,17 @@ In order to perform probe request sniffing, RPi's WiFi chip must have monitor mo
     2. Go to `nexmon/patches/bcm43455c0/7_45_154/nexmon/` for the proper firmware patch.
 6. After running `ifconfig mon0 up`, if `tcpdump -i mon0` returns info, that means the patch has been successful. Another way to notice whether `mon0` is up is to run `iwconfig` and see whether `mon0` has a field called `Tx-Power=?? dBm`. If this field exists, `mon0` is up, otherwise `mon0` is configured but not up.
 
-## 2. Run Script on RPi
+## 2. Set up AWS Environment
+* Register an account on aws if you haven't already and create a s3 bucket for storing data.
+* Go through [this tutorials](https://docs.aws.amazon.com/iot/latest/developerguide/iot-plant-module1.html) for setting up aws iot and make appropriate modifications when necessary.
+	* In step 2 of the tutorial, generate certificates for connecting your RPi to a shadow client on aws iot and place them in the `keys` directory.
+	* In step 4 of the tutorial, make the following changes:
+	  * For item 5 "rule query statement", use this statement `SELECT VALUE state.reported.data FROM "$aws/things/RPi_3Bplus_WPB_test/shadow/update/accepted"`
+	  * For item 7 "select an action", choose "Store a message in an Amazon S3 bucket". In the "Keys" blank, fill in `${state.reported.timestamp}.csv`
+
+## 3. Run Script on RPi
 * Download this repository and install the Python dependencies via `pip3 install -r requirements.txt`. We recommend that you create a virtual environment before installing the dependencies.
-* Run `./start_up.sh`. This will do two things. First, it turns on `mon0` if it is not on already, and start monitoring probe request using an open source tool [sniff-probes](https://github.com/brannondorsey/sniff-probes) (located within the `sniff-probes` directory). Second, it runs an uploading service in the background, which automatically connects to aws iot shadow client via the certificates stored in `keys` directory (follow [this tutorial](https://docs.aws.amazon.com/iot/latest/developerguide/iot-plant-step2.html) for how the certificates are generated), and send probe requests data as MQTT message. The messages sent to aws iot will trigger an action to store the messages in a predefined s3 bucket.
+* Run `./start_up.sh`. This will do two things. First, it turns on `mon0` if it is not on already, and start monitoring probe request using an open source tool [sniff-probes](https://github.com/brannondorsey/sniff-probes) (located within the `sniff-probes` directory). Second, it runs an uploading service in the background, which automatically connects to aws iot shadow client via the certificates stored in `keys` directory, and send probe requests data as MQTT message. The messages sent to aws iot will trigger an action to store the messages in a predefined s3 bucket.
 * User can configure how long each monitoring session should be. For example, `./start_up.sh -p 30` means to let each monitoring session be 30 seconds, and restart again. The benefit of making monitoring into sessions is that the data collected can be dumped in small chunks. This prevents potential data loss due to monitoring malfunction, and make data upload to cloud much easier. If a flag is not used, the default monitoring session length is 60 seconds.
 
 # Things Worth Noting
