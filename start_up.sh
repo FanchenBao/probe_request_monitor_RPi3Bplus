@@ -28,7 +28,7 @@ main() {
 }
 
 cleanup() {
-    if [[ "$UPLOAD_PID" -ne 0 ]]; then
+    if ps -p $UPLOAD_PID > /dev/null; then
         kill $UPLOAD_PID
     fi
     sudo ifconfig mon0 down  # turn down monitor mode
