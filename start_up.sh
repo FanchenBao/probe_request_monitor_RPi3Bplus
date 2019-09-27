@@ -9,7 +9,7 @@ main() {
 
     # enable monitor mode if it hasn't been turned on already
     NUM_MON0=`iwconfig | grep mon0 | wc -l`
-    if [ "$NUM_MON0" -lt "1" ]; then
+    if [[ "$NUM_MON0" -lt "1" ]]; then
         sudo iw phy `iw dev wlan0 info | gawk '/wiphy/ {printf "phy" $2}'` interface add mon0 type monitor
     fi
  
@@ -28,7 +28,7 @@ main() {
 }
 
 cleanup() {
-    if [ $UPLOAD_PID -ne 0 ]; then
+    if [[ "$UPLOAD_PID" -ne 0 ]]; then
         kill $UPLOAD_PID
     fi
     sudo ifconfig mon0 down  # turn down monitor mode
